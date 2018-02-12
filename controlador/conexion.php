@@ -13,32 +13,27 @@ $mysqli->set_charset("utf8");
 
 // Opens a connection to a MySQL server
 if ($mysqli->connect_errno) {
-	echo "Error: No se pudo conectar a MySQL." . PHP_EOL;
+	die ("Error: No se pudo conectar a MySQL." . PHP_EOL);
 	exit;
 }
-echo "Éxito: Se realizó una conexión apropiada a MySQL! La base de datos RESTAURANTES es genial." . PHP_EOL;
 
 $consulta= "SELECT * FROM restaurante WHERE 1";
+$resultado = $mysqli->query($consulta);
 
 // Select all the rows in the restaurante table
-if($resultado = $mysqli->query($consulta)){
-	echo "Consulta realizada con exito.";
-	while ($fila = $resultado->fetch_assoc()) {
-        printf ("%s-(%s)\n", $fila["NOMRESTAURANTE"], $fila["DESCRESTAURANTE"]);
-    }
-}
-else{
-	echo "Fallo la consulta!!".$mysqli->error;
+if(!$resultado){
+	die ("Fallo la consulta!!".$mysqli->error);
 }
 
 header("Content-type: text/xml; charset=utf-8");
 // Start XML file, echo parent node
 echo '<?xml version="1.0" encoding="utf-8" ?>';
+echo '<restaurantes>';
 
 // Iterate through the rows, printing XML nodes for each
 while ($row = $resultado->fetch_object()){	
   // Add to XML document node
-  echo '<restaurantes ';
+  echo '<restaurante ';
   echo 'NOMRESTAURANTE="' . parseToXML($row->NOMRESTAURANTE) . '" ';
   echo 'DESCRESTAURANTE="' . parseToXML($row->DESCRESTAURANTE) . '" ';
   echo 'DIRECCIONRESTAURANTE="' . parseToXML($row->DIRECCIONRESTAURANTE) . '" ';
